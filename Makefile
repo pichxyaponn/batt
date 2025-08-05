@@ -22,6 +22,8 @@ ENTRY           := ./cmd/batt
 BIN_PLATFORMS   := darwin/arm64
 # Binary basename (.exe will be automatically added when building for Windows)
 BIN             := batt
+# macOS specific settings
+MACOSX_DEPLOYMENT_TARGET ?= 13.0
 
 # Setup make variables
 include makefiles/consts.mk
@@ -32,12 +34,12 @@ include makefiles/targets.mk
 lint:
 	bash build/lint.sh
 
-build-gui: build
+app: build
 	rm -rf bin/batt.app
 	cp -r hack/boilerplates/batt.app bin
 	export version=$$(echo "$(VERSION)" | sed 's/v//g') && sed -i '' "s|BATT_VERSION|$$version|g" bin/batt.app/Contents/Info.plist
 	mkdir -p bin/batt.app/Contents/MacOS
 	cp bin/batt bin/batt.app/Contents/MacOS/batt
 
-dmg: build-gui
+dmg: app
 	cd bin && create-dmg --volname batt --app-drop-link 360 130 --icon batt 130 130 --format ULFO "batt-$(VERSION).dmg" batt.app

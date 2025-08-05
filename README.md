@@ -44,18 +44,21 @@ Yes, macOS have optimized battery charging. It will try to find out your chargin
 
 ## Compatibility Matrix
 
-|                     | GUI | CLI (Prebuilt) | CLI (Build from Source) |
-| ------------------- |-----| -------------- | ----------------------- |
-| macOS Big Sur (11)  | ❌   | ❌              | ✅                       |
-| macOS Monterey (12) | ❌   | ✅              | ✅                       |
-| macOS Ventura (13)  | ✅   | ✅              | ✅                       |
-| macOS Sonoma (14)   | ✅   | ✅              | ✅                       |
-| macOS Sequoia (15)  | ✅   | ✅              | ✅                       |
-| macOS Tahoe (26)    | ⚠️  | ⚠️              | ⚠️                       |
+| Firmware Version        | GUI | CLI (Prebuilt) | CLI (Build from Source) |
+|-------------------------|-----| -------------- | ----------------------- |
+| `6723.x.x`              | ❌   | ❌              | ✅                       |
+| `7429.x.x` / `7459.x.x` | ❌   | ✅              | ✅                       |
+| `8419.x.x` / `8422.x.x` | ✅   | ✅              | ✅                       |
+| `10151.x.x`             | ✅   | ✅              | ✅                       |
+| `11881.x.x`             | ✅   | ✅              | ✅                       |
+| `13822+`                | ⚠️  | ⚠️              | ⚠️                       |
 
 - ❌: Unsupported
 - ✅: Supported
 - ⚠️: Partially supported, more tests are needed to verify the compatibility. Read [#34](https://github.com/charlie0129/batt/issues/34) for details.
+
+> [!NOTE]
+> Firmware version is different from macOS version. You can check your firmware version by running `system_profiler SPHardwareDataType | grep -i firmware` in Terminal.
 
 If you want to know which MacBooks I personally developed it on, I am using it on all my personal MacBooks every single day, including MacBook Air M1 2020 (A2337), MacBook Air M2 2022 (A2681), MacBook Pro 14' M1 Pro 2021 (A2442), MacBook Pro 16' M1 Max 2021 (A2485).
 
@@ -184,6 +187,24 @@ As described in [Preventing idle sleep](#preventing-idle-sleep), batt will be pa
 
 To enable this feature, run `sudo batt disable-charging-pre-sleep enable`. To disable, run `sudo batt disable-charging-pre-sleep disable`.
 
+### Prevent system sleep
+
+Set whether to prevent system sleep during a charging session (experimental).
+
+This option tells macOS to create power assertion, which prevents sleep, when all conditions are met:
+
+1) charging is active
+2) battery charge limit is enabled
+3) computer is connected to charger.
+
+So your computer can go to sleep as soon as a charging session is completed / charger disconnected.
+
+Does similar thing to [Preventing idle sleep](#preventing-idle-sleep), but works for manual sleep too.
+
+*Note*: Please disable [Preventing idle sleep](#preventing-idle-sleep) and [Disabling charging before sleep](#disabling-charging-before-sleep), while this feature is in use.
+
+To enable this feature, run `sudo batt prevent-system-sleep enable`. To disable, run `sudo batt prevent-system-sleep disable`.
+
 ### Upper and lower charge limit
 
 > [!NOTE]  
@@ -217,7 +238,21 @@ Logs are directed to `/tmp/batt.log`. If something goes wrong, you can check the
 
 You need to install command line developer tools (by running `xcode-select --install`) and Go (follow the official instructions [here](https://go.dev/doc/install)).
 
+### CLI
+
+```shell
+make
+```
+
 Simply running `make` in this repo should build the binary into `./bin/batt`. You can then follow [the upgrade guide](#how-to-upgrade) to install it (you just use the binary you have built, not downloading a new one, of course).
+
+### GUI
+
+```shell
+make app
+```
+
+This will build the GUI version of `batt` into `./bin/batt.app`. Drag it to `/Applications` and run it.
 
 ## Architecture
 
